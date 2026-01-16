@@ -1,32 +1,30 @@
-import axios from "axios";
+import axios from 'axios';
 
-type PostResponse = 
-{
+interface Post {
+  userId: number;
   id: number;
   title: string;
-};
-
-export async function getEdgePosts(): Promise<
-  { id: number; title: string }[]
-> {
-  try {
-    const response = await axios.get<PostResponse[]>(
-      "https://jsonplaceholder.typicode.com/posts"
-    );
-
-    const posts = response.data.map(({ id, title }) => ({ id, title }));
-
-    if (posts.length === 0) {
-      return [];
-    }
-
-    if (posts.length === 1) {
-      return [posts[0], posts[0]];
-    }
-
-    return [posts[0], posts[posts.length - 1]];
-  } catch 
-  {
-    return [];
-  }
+  body: string;
 }
+
+interface UserPost {
+  id: number;
+  title: string;
+}
+
+export const getPostsByUser = async (userId: number): Promise<UserPost[]> => {
+  try {
+    const { data } = await axios.get<Post[]>('https://jsonplaceholder.typicode.com/posts');
+
+
+    return data
+      .filter((post) => post.userId === userId)
+      .map(({ id, title }) => ({
+        id,
+        title,
+      }));
+
+  } catch (error) {
+    throw error;
+  }
+};
